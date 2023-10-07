@@ -1,0 +1,92 @@
+bgg_reviews.csv (6,479,397 instances, 6 attributes)
+(Combined self-scrape data with Kaggle dataset with comments)
+- game_type
+- bgg_id
+- name
+- username
+- rating
+- comment
+
+
+bgg_reviews_no_comments.csv (15,596,189 instances, 6 attributes) 
+(From Kaggle: https://www.kaggle.com/datasets/jvanelteren/boardgamegeek-reviews?select=bgg-19m-reviews.csv
+and keeping only those without comments - showing only ratings)
+- game_type
+- bgg_id
+- name
+- username
+- rating
+- comment
+
+
+boardgame_awards.csv (15,816 instances, 5 attributes) - scraped as of 2023-09-24
+Scrape the list of boardgame awards listed on boardgamefeek
+- award_name
+- game
+- link
+- status
+- bgg_id
+
+
+bgg_username.csv (237,850 instances, 8 attributes) - scraped as of 2023-09-25
+Retrieve the attributes of users available on boardgamegeek using boardgamegeek API
+- id
+- username
+- firstname
+- lastname
+- yearregistered
+- lastlogin
+- state
+- country
+
+
+bgg_id.csv (147,558 instances, 4 attributes) - scraped as of 2023-09-01
+Scrape the list of all boardgames available on https://boardgamegeek.com/browse/boardgame to get the corresponding BGG ID for each game.
+- index
+- name
+- link
+- bgg_id
+
+
+boardgames.csv (147,558 instances,  40 attributes) - scraped as of 2023-09-01
+Retrieve the attributes of each boardgames available on boardgamegeek using boardgamegeek API (https://boardgamegeek.com/wiki/page/BGG_XML_API2)
+- game_type
+- bgg_id
+- thumbnail
+- image
+- name
+- description
+- year
+- min_player
+- max_player
+- playtime
+- min_playtime
+- max_playtime
+- min_age
+- category
+- mechanic
+- family
+- expansion
+- designer
+- artist
+- publisher
+- reimplementation
+- user_rating
+- avg_rating
+- bayes_rating
+- std_dev
+- median
+- owned
+- trading
+- wanting
+- wishing
+- num_comments
+- num_weights
+- avg_weights
+- rank
+- suggested_numplayers_votes
+- num_players
+- sugested_playerage_votes
+- num_age
+- language_dependence_votes
+- language
