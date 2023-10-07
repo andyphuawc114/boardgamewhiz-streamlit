@@ -30,7 +30,7 @@ def run():
     df = conn.read("boardgamewhiz-bucket/boardgames.csv", input_format="csv", ttl=600)
 
     st.write(":balloon: # Welcome to Streamlit! 👋")
-
+    st.write(df.iloc[0]['name'])
     st.sidebar.success("Select a demo above.")
 
     st.markdown(
