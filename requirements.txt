@@ -4,3 +4,4 @@ pandas
 pydeck
 streamlit
 gcsfs
+git+https://github.com/streamlit/files-connection
