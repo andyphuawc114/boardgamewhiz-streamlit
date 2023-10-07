@@ -14,6 +14,8 @@
 
 import streamlit as st
 from streamlit.logger import get_logger
+from st_files_connection import FilesConnection
+import pandas as pd
 
 LOGGER = get_logger(__name__)
 
@@ -23,6 +25,9 @@ def run():
         page_title="Hello",
         page_icon="👋",
     )
+
+    conn = st.experimental_connection('gcs', type=FilesConnection)
+    df = conn.read("boardgamewhiz-bucket/boardgames.csv", input_format="csv", ttl=600)
 
     st.write(":balloon: # Welcome to Streamlit! 👋")
 
