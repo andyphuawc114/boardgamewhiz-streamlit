@@ -2,6 +2,14 @@ import pandas as pd
 import streamlit as st
 from st_files_connection import FilesConnection
 
+
+def show_table(df):
+    selected_df = df.iloc[0:10]
+    selected_df['year'] = selected_df['year'].astype('str')
+    selected_df = selected_df[['rank', 'bgg_id','name','year']]
+
+    st.dataframe(selected_df, hide_index=True)
+
 def trend_visual():
     @st.cache_data
     def get_data():
@@ -10,7 +18,9 @@ def trend_visual():
         return df
 
     df = get_data()
-    st.write(df.iloc[0]['name'])
+    st.write("Top 10 Board Games")
+
+    show_table(df)
 
 st.set_page_config(page_title="Trends Visualizer", page_icon="📊")
 st.markdown("# Trends")
