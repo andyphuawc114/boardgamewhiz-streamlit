@@ -52,7 +52,8 @@ rpds-py==0.10.4
 rsa==4.9
 six==1.16.0
 smmap==5.0.1
-git+https://github.com/streamlit/files-connection
+st-files-connection==0.1.0
+st-pages==0.4.5
 streamlit==1.27.2
 tenacity==8.2.3
 toml==0.10.2
