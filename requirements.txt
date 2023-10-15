@@ -1,6 +1,6 @@
 altair==5.1.2
 numpy==1.26.0
-pandas==2.1.1altair==5.1.2
+pandas==2.1.1
 pydeck==0.8.0
 gcsfs==2023.9.2
 st-files-connection==0.1.0
