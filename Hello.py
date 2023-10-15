@@ -15,6 +15,7 @@
 import streamlit as st
 from streamlit.logger import get_logger
 from st_files_connection import FilesConnection
+from st_pages import Page, show_pages, add_page_title
 import pandas as pd
 
 LOGGER = get_logger(__name__)
@@ -26,12 +27,27 @@ def run():
         page_icon="👋",
     )
 
-    conn = st.experimental_connection('gcs', type=FilesConnection)
-    df = conn.read("boardgamewhiz-bucket/boardgames.csv", input_format="csv", ttl=600)
-    st.write(":balloon: # Welcome to BoardGameWhiz! 👋")
-    #st.write(df.iloc[0]['name'])
+    # load data
+    #conn = st.experimental_connection('gcs', type=FilesConnection)
+    #df = conn.read("boardgamewhiz-bucket/boardgames.csv", input_format="csv", ttl=600)
     
-    st.sidebar.success("Select a demo above.")
+    st.write('''# BoardGameWhiz''')
+    
+    st.write(":balloon: *Welcome to BoardGameWhiz - Translating Board Game Data into Insights!* 👋")
+
+    # rename the sidebar menu labelling
+    show_pages(
+    [
+        Page("Hello.py", "Home"),
+        Page('pages/0_Trends.py', "Trend Visualizer"),
+        Page('pages/0_Animation_Demo.py', "Animation"),
+        Page('pages/1_Plotting_Demo.py', "Plot"),
+        Page('pages/2_Mapping_Demo.py', "Map"),
+        Page('pages/3_DataFrame_Demo.py', "DataFrame"),        
+    ]
+    ) 
+    
+    #st.sidebar.success("Select a demo above.")
 
     st.markdown(
         """
