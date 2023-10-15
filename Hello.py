@@ -22,31 +22,24 @@ LOGGER = get_logger(__name__)
 
 def run():
     st.set_page_config(
-        page_title="Hello",
+        page_title="BoardGameWhiz",
         page_icon="👋",
     )
 
     conn = st.experimental_connection('gcs', type=FilesConnection)
     df = conn.read("boardgamewhiz-bucket/boardgames.csv", input_format="csv", ttl=600)
-    st.write(":balloon: # Welcome to Streamlit! 👋")
-    st.write(df.iloc[0]['name'])
+    st.write(":balloon: # Welcome to BoardGameWhiz! 👋")
+    #st.write(df.iloc[0]['name'])
+    
     st.sidebar.success("Select a demo above.")
 
     st.markdown(
         """
-        Streamlit is an open-source app framework built specifically for
-        Machine Learning and Data Science projects.
-        **👈 Select a demo from the sidebar** to see some examples
-        of what Streamlit can do!
-        ### Want to learn more?
-        - Check out [streamlit.io](https://streamlit.io)
-        - Jump into our [documentation](https://docs.streamlit.io)
-        - Ask a question in our [community
-          forums](https://discuss.streamlit.io)
-        ### See more complex demos
-        - Use a neural net to [analyze the Udacity Self-driving Car Image
-          Dataset](https://github.com/streamlit/demo-self-driving)
-        - Explore a [New York City rideshare dataset](https://github.com/streamlit/demo-uber-nyc-pickups)
+        ### Introduction
+        BoardGameWhiz is a user-centric board game visualizer built for the board game community.
+        The data source is based on [boardgamegeek](https://boardgamegeek.com/)
+
+        **👈 Select a demo from the sidebar** to navigage to other functions.
     """
     )
 
