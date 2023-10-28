@@ -17,6 +17,7 @@ from streamlit.logger import get_logger
 from st_files_connection import FilesConnection
 from st_pages import Page, show_pages, add_page_title
 import pandas as pd
+import plotly.express as px
 
 LOGGER = get_logger(__name__)
 
@@ -58,6 +59,41 @@ def run():
         **👈 Select a demo from the sidebar** to navigage to other functions.
     """
     )
+
+    @st.cache_data
+    def get_data():
+        conn = st.experimental_connection('gcs', type=FilesConnection)
+        df = conn.read("boardgamewhiz-bucket/boardgames_cleaned.csv", input_format="csv", ttl=600)
+        return df
+
+    df = get_data()
+
+    row3_space1, row3_1, row3_space2, row3_2, row3_space3 = st.columns(
+    (0.1, 1, 0.1, 1, 0.1))
+
+    with row3_1:
+        st.subheader("Average User Ratings Trend")
+        df_ratings = df[['bgg_id', 'name', 'year', 'avg_rating']]
+        df_ratings = df_ratings[(df_ratings['year'] >= 2000) & (df_ratings['year'] <= 2023)]
+        df_ratings_avg = df_ratings.groupby('year')['avg_rating'].mean().reset_index()
+
+        fig = px.line(df_ratings_avg, x="year", y="avg_rating",
+              labels={"year": "Year Published","avg_rating": "Avg User Rating"})
+        
+        fig.show()
+
+        st.plotly_chart(fig, theme="streamlit", use_container_width=True)
+
+    with row3_2:
+        st.subheader("Testing")
+
+        fig = px.line(df_ratings_avg, x="year", y="avg_rating",
+              labels={"year": "Year Published","avg_rating": "Avg User Rating"})
+        
+        fig.show()
+
+        st.plotly_chart(fig, theme="streamlit", use_container_width=True)        
+
 
 
 if __name__ == "__main__":
