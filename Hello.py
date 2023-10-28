@@ -26,12 +26,13 @@ def run():
     st.set_page_config(
         page_title="BoardGameWhiz",
         page_icon="👋",
+        layout="wide"
     )
 
     # load data
     #conn = st.experimental_connection('gcs', type=FilesConnection)
     #df = conn.read("boardgamewhiz-bucket/boardgames.csv", input_format="csv", ttl=600)
-    
+
     st.write('''# BoardGameWhiz''')
     
     st.write(":balloon: *Welcome to BoardGameWhiz - Translating Board Game Data into Insights!* 👋")
