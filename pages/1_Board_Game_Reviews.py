@@ -2,6 +2,7 @@ import numpy as np
 import streamlit as st
 import pandas as pd
 from google.oauth2 import service_account
+from st_aggrid import GridOptionsBuilder, AgGrid, GridUpdateMode, DataReturnMode, JsCode, ColumnsAutoSizeMode
 
 st.set_page_config(page_title="Board Game Reviews",
                    page_icon="📊",
@@ -55,6 +56,7 @@ with row2_3:
         placeholder="Select rating...",
     )
 
+
 # UNCOMMENT BELOW TO TEST OR ONCE READY FOR PROD
 # THIS IS TO PREVENT UNNECSSARY BIGQUERY
 
@@ -71,9 +73,64 @@ if selected_game and selected_sentiment:
     where bgg_id = {str(selected_bgg_id)}
     and final_sentiment = '{selected_sentiment}'
     order by label_proba desc
-    LIMIT 10)
+    LIMIT 20)
     '''
 
     reviews_df = pd.read_gbq(query, credentials = credentials)
 
-    st.dataframe(reviews_df, hide_index=True)
+#     st.dataframe(reviews_df, hide_index=True)
+
+# TEST USING AGGRID FOR MORE CONTROL
+
+    #Infer basic colDefs from dataframe types
+    
+    gb = GridOptionsBuilder.from_dataframe(reviews_df)
+    
+    gb.configure_pagination(paginationAutoPageSize=False, paginationPageSize=10)
+
+    #gb.configure_default_column(tooltipField="Review")
+    gb.configure_column(field="Review", maxWidth=400, tooltipField="Review", tooltipComponent = JsCode("""
+                                                        class CustomTooltip {
+                                                            eGui;
+                                                            init(params) {
+                                                                const eGui = (this.eGui = document.createElement('div'));
+                                                                const color = params.color || 'black';
+                                                                const data = params.api.getDisplayedRowAtIndex(params.rowIndex).data;
+                                                                eGui.classList.add('custom-tooltip');
+                                                                //@ts-ignore
+                                                                eGui.style['background-color'] = color;
+                                                                eGui.style['color'] = 'white';     
+                                                                eGui.style['padding'] = "5px 5px 5px 5px";  
+                                                                eGui.style['font-size'] = "15px";                                         
+                                                                eGui.style['border-style'] = 'double';                                                             
+                                                                this.eGui.innerText = data.Review;
+                                                            }
+                                                            getGui() {
+                                                                return this.eGui;
+                                                            }
+                                                            }"""))
+    
+    gb.configure_grid_options(domLayout='normal')
+    gridOptions = gb.build()
+    
+    grid_height = 380
+
+    grid_response = AgGrid(
+        reviews_df, 
+        gridOptions=gridOptions,
+        height=grid_height, 
+        width='100%',
+        fit_columns_on_grid_load=False,
+        columns_auto_size_mode=ColumnsAutoSizeMode.FIT_CONTENTS,   # FIT_ALL_COLUMNS_TO_VIEW
+        allow_unsafe_jscode=True, #Set it to True to allow jsfunction to be injected
+        custom_css={"#gridToolBar": {"padding-bottom": "0px !important"}}
+        )
+
+
+
+
+
+
+
+
+
