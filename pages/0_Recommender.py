@@ -20,7 +20,7 @@ def get_game_df(raw_df):
     df = df[df['max_playtime'] != 0].copy()
     df = df.drop(columns = ['rank','game_type','image','description','expansion','designer','artist','publisher',
                             'reimplementation','user_rating','avg_rating','bayes_rating','std_dev', 'median','owned',
-                            'trading','wanting','wishing','num_comments','family_list', 'num_weights','playtime','bgg_name'])
+                            'trading','wanting','wishing','num_comments','family_list', 'num_weights','playtime'])
     game_df = df.copy()
     print(game_df.columns)
     return game_df

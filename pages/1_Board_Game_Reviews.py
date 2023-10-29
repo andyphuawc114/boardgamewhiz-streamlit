@@ -13,7 +13,7 @@ st.write(
 
 st.write("Board Games Reviews")
 
-df = st.session_state['main_data']
+df = st.session_state['main_data'].copy()
 df['bgg_name'] = df['bgg_id'].astype(str) + ": " + df['name']
 bgg = df['bgg_name'].unique()
 
