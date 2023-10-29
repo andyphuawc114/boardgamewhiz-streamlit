@@ -27,7 +27,7 @@ def get_game_df(raw_df):
 
 game_df = get_game_df(raw_df)
 
-game_attributes_df = game_df[['bgg_id','name','year','thumbnail']]
+game_attributes_df = game_df[['bgg_id','name','year','thumbnail']].copy()
 game_attributes_df['link'] = game_attributes_df['bgg_id'].apply(lambda x: "https://boardgamegeek.com/boardgame/" + str(x))
 
 # FUNCTIONS TO CONVERT TO HTML TABLE
