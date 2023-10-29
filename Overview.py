@@ -1,17 +1,3 @@
-# Copyright (c) Streamlit Inc. (2018-2022) Snowflake Inc. (2022)
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-#     http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
-
 import streamlit as st
 from streamlit.logger import get_logger
 from st_files_connection import FilesConnection
@@ -52,10 +38,9 @@ st.write(":balloon: *Welcome to BoardGameWhiz - Translating Board Game Data into
 # rename the sidebar menu labelling
 show_pages(
 [
-    Page("Hello.py", "Home"),
-    Page('pages/0_Trends.py', "Recommendation"),
-    Page('pages/0_Animation_Demo.py', "Animation"),
-    Page('pages/1_Plotting_Demo.py', "Plot"),
+    Page("Overview.py", "Overview"),
+    Page('pages/0_Recommender.py', "Recommender"),
+    Page('pages/1_Board_Game_Reviews.py', "Board Game Reviews"),
     Page('pages/2_Mapping_Demo.py', "Map"),
     Page('pages/3_DataFrame_Demo.py', "DataFrame"),        
 ]
@@ -94,7 +79,7 @@ with row3_1:
 with row3_2:
     st.subheader("User Rating by Genre")
 
-    df_genre = df[['bgg_id', 'name', 'year', 'avg_rating', 'abstracts', 'cgs', 'childrensgames', 'familygames', 'partygames', 'strategygames', 'thematic', 'wargames']]
+    df_genre = df[['bgg_id', 'name', 'year', 'avg_rating', 'abstracts', 'cgs', 'childrensgames', 'familygames', 'partygames', 'strategygames', 'thematic', 'wargames']].copy()
     df_genre['avg_rating_group'] = df_genre['avg_rating'].apply(np.floor)
     df_genre = df_genre[df_genre['avg_rating'] > 0.00]
     df_genre = df_genre[['avg_rating_group','abstracts', 'cgs', 'childrensgames', 'familygames', 'partygames', 'strategygames', 'thematic', 'wargames']]

@@ -1,6 +1,5 @@
 import pandas as pd
 import streamlit as st
-from google.oauth2 import service_account
 
 st.set_page_config(page_title="Recommendation",
                    page_icon="📊",
@@ -11,25 +10,11 @@ st.write(
     of various board games"""
 )
 
-
-credentials = service_account.Credentials.from_service_account_info(
-    st.secrets["gcp_service_account"]
-)
-
-query  = '''
-SELECT  * FROM `tensile-walker-401308.eng_reviews.reviews` 
-where bgg_id = 224517
-LIMIT 10;
-'''
-new_df = pd.read_gbq(query, credentials = credentials)
-
-st.dataframe(new_df, hide_index=True)
-
 df = st.session_state['main_data']
 
 st.write("Top 10 Board Games")
 
-selected_df = df.iloc[0:10]
+selected_df = df.iloc[0:10].copy()
 selected_df['year'] = selected_df['year'].astype('str')
 selected_df = selected_df[['rank', 'bgg_id','name','year','thumbnail']]
 #selected_df['link'] = selected_df['bgg_id'].apply(lambda x: "https://boardgamegeek.com/boardgame/" + str(x))
