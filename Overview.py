@@ -58,12 +58,10 @@ st.markdown(
 """
 )
 
-row3_space1, row3_1, row3_space2, row3_2, row3_space3 = st.columns(
-(0.1, 1, 0.1, 1, 0.1))
-
+row1_1, row1_space1, row1_2 = st.columns((0.45, 0.1, 0.45))
 
 # LINE CHART TO SHOW USER RATINGS TREND
-with row3_1:
+with row1_1:
     st.subheader("Average User Ratings Trend")
     df_ratings = df[['bgg_id', 'name', 'year', 'avg_rating']]
     df_ratings = df_ratings[(df_ratings['year'] >= 2000) & (df_ratings['year'] <= 2023)]
@@ -76,11 +74,10 @@ with row3_1:
 
 
 # STACKED BAR CHART TO SHOW USER RATING BY GENRE
-with row3_2:
+with row1_2:
     st.subheader("User Rating by Genre")
 
-    df_genre = df[['bgg_id', 'name', 'year', 'avg_rating', 'abstracts', 'cgs', 'childrensgames', 'familygames', 'partygames', 'strategygames', 'thematic', 'wargames']].copy()
-    df_genre['avg_rating_group'] = df_genre['avg_rating'].apply(np.floor)
+    df_genre = df[['bgg_id', 'name', 'year', 'avg_rating','avg_rating_group', 'abstracts', 'cgs', 'childrensgames', 'familygames', 'partygames', 'strategygames', 'thematic', 'wargames']].copy()
     df_genre = df_genre[df_genre['avg_rating'] > 0.00]
     df_genre = df_genre[['avg_rating_group','abstracts', 'cgs', 'childrensgames', 'familygames', 'partygames', 'strategygames', 'thematic', 'wargames']]
     genre_dict = {'abstracts': 'Abstract', 'cgs': 'Customizable', 'childrensgames': 'Children', 'familygames': 'Family', 'partygames': 'Party',
@@ -99,6 +96,56 @@ with row3_2:
     ))
 
     st.plotly_chart(fig, theme="streamlit", use_container_width=True)        
+
+row2_1, row1_space1, row2_2 = st.columns((0.45, 0.1, 0.45))
+
+# SCATTER PLOT CHART OF WEIGHT-RATING
+
+with row2_1:
+    st.subheader("Complexity-Rating")
+
+    df_weights = df[['bgg_id', 'name', 'year', 'avg_rating', 'avg_weights', 'user_rating']].copy()
+    df_weights['avg_rating'] = df_weights['avg_rating'].round(2)
+    df_weights['avg_weights'] = df_weights['avg_weights'].round(2)
+
+    df_weights = df_weights[(df_weights['year'] >= 2000) & (df_weights['year'] <= 2023) & (df_weights['user_rating'] >= 1000)]
+
+    fig = px.scatter(df_weights, x="avg_weights", y="avg_rating", opacity=0.5, hover_data=['name','year','user_rating'], 
+                 labels={"name":"Game","avg_weights": "Complexity","avg_rating": "Rating",'year':'Year','user_rating':'Votes'})
+
+    st.plotly_chart(fig, theme="streamlit", use_container_width=True)     
+
+with row2_2:
+    st.subheader("Heatmap")
+
+    new_df = df[(df['year'] >= 2000) & (df['year'] <= 2023)].copy()
+    my_col = new_df.columns[new_df.columns.str.contains('cat_')].to_list()
+    my_col.append('year')
+    new_df = new_df[my_col]
+
+    # top 1000 games
+    df_test = new_df.iloc[:1000].copy()
+
+    col_to_delete = df_test.sum(axis=0, numeric_only = True).reset_index().rename({0:'value'}, axis = 1)
+    col_to_delete = col_to_delete[col_to_delete['value'] == 0.0]['index'].to_list()
+    col_to_delete = [i for i in col_to_delete if 'cat_' in i]
+    df_matrix = df_test.drop(columns=col_to_delete)
+
+    df_matrix.columns = df_matrix.columns.str.replace("cat_","")
+    df_matrix = df_matrix.rename({'Industry / Manufacturing': 'Industry'}, axis = 1)
+    df_matrix = df_matrix.groupby('year').sum()
+    game_idx = df_matrix.sum().reset_index()
+    fifty_idx = game_idx[game_idx[0] > 50]
+
+    df_matrix = df_matrix[fifty_idx['index']]
+    fig = px.imshow(df_matrix.T, labels={"x":"Year","y": "Category",'color':'Count'})
+    fig.update_layout(yaxis_title=None, yaxis = dict(tickfont = dict(size=10)))
+
+    
+
+    #st.dataframe(df_matrix)
+    st.plotly_chart(fig, theme="streamlit", use_container_width=True)   
+
 
 # if __name__ == "__main__":
 #     run(df)
