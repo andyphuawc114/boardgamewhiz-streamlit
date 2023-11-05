@@ -18,9 +18,10 @@ raw_df = st.session_state['main_data']
 def get_game_df(raw_df):
     df = raw_df[raw_df['game_type'] == 'boardgame'].copy()
     df = df[df['max_playtime'] != 0].copy()
-    df = df.drop(columns = ['rank','game_type','image','description','expansion','designer','artist','publisher',
-                            'reimplementation','user_rating','avg_rating','bayes_rating','std_dev', 'median','owned',
-                            'trading','wanting','wishing','num_comments','family_list', 'num_weights','playtime'])
+    df = df.drop(columns = ['rank','game_type','description','expansion','designer','artist','publisher',
+                            'reimplementation','user_rating','avg_rating','avg_rating_group','bayes_rating','std_dev', 'median','owned',
+                            'trading','wanting','wishing','num_comments','family_list', 'num_weights','playtime',
+                             'player_recommend','age_recommend'])
     game_df = df.copy()
     print(game_df.columns)
     return game_df
@@ -57,8 +58,8 @@ def find_games(game_df, selected_row, solo = None, year_after = None):
         
     game_df = pd.concat([game_df, selected_row])
     processed_name = game_df[['name','bgg_id','year']]
-    game_df = game_df.drop(columns = ['name','family_group','bgg_id','year','thumbnail'])
-    selected_row = selected_row.drop(columns = ['name','family_group','bgg_id','year','thumbnail'])
+    game_df = game_df.drop(columns = ['name','family_group','bgg_id','year','thumbnail','image'])
+    selected_row = selected_row.drop(columns = ['name','family_group','bgg_id','year','thumbnail','image'])
     
     nan_eqv = 9999
     categorical_ix = [i+6 for i in range(284)]
@@ -83,8 +84,8 @@ def find_games(game_df, selected_row, solo = None, year_after = None):
 games = game_df['name']
 game_name = pd.DataFrame(game_df['name'])
 
-row2_spacer1, row2_1, row2_spacer2 = st.columns((0.05, 0.5, 0.05))
-with row2_1:
+row1_spacer1, row1_1, row1_spacer2 = st.columns((0.05, 0.9, 0.05))
+with row1_1:
     selected_game = st.selectbox(
         "Select Board Game",
         (
@@ -94,21 +95,56 @@ with row2_1:
         placeholder="Select game...",
     )
 
+
+st.text("")
+
+row2_1, row2_spacer1, row2_2, row2_spacer2, row2_3 = st.columns((0.2, 0.05, 0.2, 0.05, 0.5))
+
+run_algo = False
+
 if selected_game:
-    index = game_name[game_name['name'] == selected_game].index[0]
-    selected_row = game_df.loc[[index]]
+    with row2_1:
+        img_url = game_df[game_df['name'] == selected_game]['image'].values[0]
+        st.image(img_url, width =200)
 
-    processed_name, final_idx, final_measure = find_games(game_df, selected_row, False)
-    recommended_df = pd.concat([processed_name.iloc[final_idx],pd.DataFrame(final_measure).set_index(processed_name.iloc[final_idx].index)], axis = 1)
+    with row2_2:
+        game_id = game_df[game_df['name'] == selected_game]['bgg_id'].values[0]
+        game_naming = game_df[game_df['name'] == selected_game]['name'].values[0]
+        game_year = game_df[game_df['name'] == selected_game]['year'].values[0]
 
-    final_df = game_attributes_df[game_attributes_df['bgg_id'].isin(recommended_df['bgg_id'].to_list())].copy()
-    final_df = final_df.rename({'bgg_id': 'ID', 'name': 'Game', 'year':'Year Published', 'thumbnail': 'Image', 'link':'URL'}, axis=1)
+        st.write(f":envelope: **Game ID**: :black[{game_id}]")
+        st.write(f":game_die: **Game Name**: :black[{game_naming}]")
+        st.write(f":date: **Year Published**: :black[{game_year}]")
 
-    html = convert_df(final_df)
+    with row2_3:
+        if st.button("Click Me to Run Recommendation! :rocket:", type="primary"):
+            run_algo = True
 
-    st.markdown(
-    html,
-    unsafe_allow_html=True)
+
+
+
+
+st.text("")
+
+if selected_game and run_algo:
+    with st.spinner('Recommendation In-Progress...'):
+        index = game_name[game_name['name'] == selected_game].index[0]
+        selected_row = game_df.loc[[index]]
+
+        processed_name, final_idx, final_measure = find_games(game_df, selected_row, False)
+        recommended_df = pd.concat([processed_name.iloc[final_idx],pd.DataFrame(final_measure).set_index(processed_name.iloc[final_idx].index)], axis = 1)
+
+        final_df = game_attributes_df[game_attributes_df['bgg_id'].isin(recommended_df['bgg_id'].to_list())].copy()
+        final_df = final_df.rename({'bgg_id': 'ID', 'name': 'Game', 'year':'Year Published', 'thumbnail': 'Image', 'link':'URL'}, axis=1)
+
+        html = convert_df(final_df)
+
+        st.markdown(
+        html,
+        unsafe_allow_html=True)
+
+
+
 
     #st.dataframe(recommended_df, hide_index = True)
 
