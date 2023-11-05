@@ -40,9 +40,7 @@ show_pages(
 [
     Page("Overview.py", "Overview"),
     Page('pages/0_Recommender.py', "Recommender"),
-    Page('pages/1_Board_Game_Reviews.py', "Board Game Reviews"),
-    Page('pages/2_Mapping_Demo.py', "Map"),
-    Page('pages/3_DataFrame_Demo.py', "DataFrame"),        
+    Page('pages/1_Board_Game_Reviews.py', "Board Game Reviews")      
 ]
 ) 
 
