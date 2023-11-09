@@ -15,7 +15,7 @@ st.set_page_config(
 
 LOGGER = get_logger(__name__)
 
-st.cache_data(ttl=3600)
+st.cache_resource(ttl=3600)
 def get_data():
     conn = st.experimental_connection('gcs', type=FilesConnection)
     df = conn.read("boardgamewhiz-bucket/boardgames_cleaned.csv", input_format="csv", ttl=600)
