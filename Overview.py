@@ -24,8 +24,8 @@ def get_data():
 
 df = get_data()
 
-# if 'main_data' not in st.session_state:
-#     st.session_state['main_data'] = df
+if 'main_data' not in st.session_state:
+    st.session_state['main_data'] = df['name']
 
 # load data
 #conn = st.experimental_connection('gcs', type=FilesConnection)

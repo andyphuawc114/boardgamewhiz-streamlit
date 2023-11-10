@@ -14,9 +14,9 @@ st.write(
 
 st.write("Board Games Reviews")
 
-df = st.session_state['main_data'].copy()
+bgg = st.session_state['main_data'].copy()
 #df['bgg_name'] = df['bgg_id'].astype(str) + ": " + df['name']
-bgg = df['name'].unique()
+#bgg = df['name'].unique()
 
 # QUERY FOR GAME REVIEWS BASED ON USER SELECTION
 
