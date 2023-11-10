@@ -56,9 +56,9 @@ with row1_2:
 
 with row1_3:
     selected_rating = st.selectbox(
-        "Select Rating",
+        "Select Rating (Optional)",
         (
-        [0,1,2,3,4,5,6,7,8,9,10]
+        ['0','1','2','3','4','5','6','7','8','9','10']
         ),
         index=None,
         placeholder="Select rating...",
@@ -68,15 +68,16 @@ st.text("")
 
 # GAME INFO TO MAKE SURE CORRECT SELECTION OF GAME BY USER
 
-row2_1, row2_spacer2, row2_2 = st.columns((0.2, 0.05, 0.75))
+run_algo = False
 
-with row2_1:
-    if selected_game:
+row2_1, row2_spacer1, row2_2, row2_spacer2, row2_3 = st.columns((0.2, 0.05, 0.2, 0.05, 0.5))
+
+if selected_game:
+    with row2_1:
         img_url = df[df['name'] == selected_game]['image'].values[0]
         st.image(img_url, width =200)
 
-with row2_2:
-    if selected_game:
+    with row2_2:
         game_id = df[df['name'] == selected_game]['bgg_id'].values[0]
         game_name = df[df['name'] == selected_game]['name'].values[0]
         game_year = df[df['name'] == selected_game]['year'].values[0]
@@ -84,6 +85,13 @@ with row2_2:
         st.write(f":envelope: **Game ID**: :black[{game_id}]")
         st.write(f":game_die: **Game Name**: :black[{game_name}]")
         st.write(f":date: **Year Published**: :black[{game_year}]")
+
+    with row2_3:
+        if st.button("Click Me to Retrieve Reviews! :rocket:", type="primary"):
+            if selected_sentiment:
+                run_algo = True       
+            else:
+                "You need to select a \"Sentiment\" first :open_mouth:"
 
 
 st.text("")
@@ -94,8 +102,21 @@ st.text("")
 # if selected_game:
 #     selected_bgg_id = int(selected_game.split(":")[0])
 
-if selected_game and selected_sentiment:
-    with st.spinner('Retrieving Reviews In-Progress...'):
+if selected_game and selected_sentiment and run_algo:
+
+    if selected_rating:
+        query  = f'''
+        select ID, Game, Rating, Review, Sentiment, `Subjectivity Score`
+        from (
+        SELECT  cast(bgg_id as STRING) as ID, name as Game, rating as Rating, comment as Review, final_sentiment as Sentiment, 
+        FORMAT('%.2F', round(subjectivity,2)) as `Subjectivity Score`
+        FROM `tensile-walker-401308.eng_reviews.reviews` 
+        where name = '{selected_game}' 
+        and final_sentiment = '{selected_sentiment}'
+        and cast(rating_group as string) = '{selected_rating}'
+        order by label_proba desc)
+        '''
+    else:
         query  = f'''
         select ID, Game, Rating, Review, Sentiment, `Subjectivity Score`
         from (
@@ -106,6 +127,7 @@ if selected_game and selected_sentiment:
         and final_sentiment = '{selected_sentiment}'
         order by label_proba desc)
         '''
+    with st.spinner('Retrieving Reviews In-Progress...'):
         reviews_df = pd.read_gbq(query, credentials = credentials)
 
 #     st.dataframe(reviews_df, hide_index=True)
@@ -114,8 +136,6 @@ if selected_game and selected_sentiment:
 
     #Infer basic colDefs from dataframe types
 
-        st.text("")
-        st.write("*You can hover your mouse over the 'Review' text. A tooltip will display the full review text* :wink:")
         st.text("")
         
         gb = GridOptionsBuilder.from_dataframe(reviews_df)
@@ -148,6 +168,9 @@ if selected_game and selected_sentiment:
         gridOptions = gb.build()
         
         grid_height = 380
+
+        st.write("*You can hover your mouse over the 'Review' text. A tooltip will display the full review text* :wink:")
+        st.text("")
 
         grid_response = AgGrid(
             reviews_df, 

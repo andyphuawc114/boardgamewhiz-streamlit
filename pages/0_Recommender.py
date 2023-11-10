@@ -52,20 +52,24 @@ def convert_df(input_df):
      return input_df.to_html(escape=False, formatters=dict(Image=path_to_image_html, ID=path_to_url_html))
 
 # RECOMMENDATION ALGO
-def find_games(game_df, selected_row, solo = None, year_after = None):
+def find_games(game_df, selected_row, selected_year = None, selected_player = None, selected_rating = None):
     fam = selected_row['family_group'].iloc[0]
     if fam != " ":
         game_df = game_df[game_df['family_group'] != fam]
-    if solo:
+    if selected_player:
         #print('Solo selected...')
-        game_df = game_df[game_df['min_player'] == 1]
-    if year_after:
-        game_df = game_df[game_df['year'] >= year_after]
+        game_df = game_df[(game_df['min_player'] <= selected_player) & (game_df['max_player'] >= selected_player)]
+    if selected_year:
+        game_df = game_df[game_df['year'] >= selected_year]
+    if selected_rating:
+        game_df = game_df[game_df['avg_rating_group'] >= selected_rating]
+    if selected_rated:
+        game_df = game_df[game_df['user_rating'] >= selected_rated]
         
     # processed_name = game_df[['name','bgg_id','year']]
 
-    game_df = game_df.drop(columns = ['name','image','thumbnail','family_group','bgg_id','year','link'])
-    selected_row = selected_row.drop(columns = ['name','image','thumbnail','family_group','bgg_id','year','link'])
+    game_df = game_df.drop(columns = ['name','image','thumbnail','family_group','bgg_id','year','link','avg_rating','avg_rating_group','user_rating'])
+    selected_row = selected_row.drop(columns = ['name','image','thumbnail','family_group','bgg_id','year','link','avg_rating','avg_rating_group','user_rating'])
 
     sim_measure = gower.gower_matrix(game_df, selected_row)
     idx = sim_measure.flatten().argsort()[:11]
@@ -83,10 +87,10 @@ def find_games(game_df, selected_row, solo = None, year_after = None):
 games = game_df['name']
 game_name = pd.DataFrame(game_df['name'])
 
-row1_spacer1, row1_1, row1_spacer2 = st.columns((0.05, 0.9, 0.05))
+row1_spacer1, row1_1, row1_spacer2 = st.columns((0.020, 0.96, 0.020))
 with row1_1:
     selected_game = st.selectbox(
-        "Select Board Game",
+        "Board Game",
         (
         games
         ),
@@ -94,19 +98,67 @@ with row1_1:
         placeholder="Select game...",
     )
 
+row2_spacer1, row2_2, row2_spacer3, row2_3, row2_spacer4, row2_4, row2_spacer5, row2_5, row2_spacer6 = st.columns((0.05, 0.5, 0.05, 0.5, 0.05, 0.5, 0.05,0.5,0.05))
+
+year_list = [i for i in range(2023,1989,-1)]
+
+with row2_2:
+    selected_year = st.selectbox(
+        "Year (Optional)",
+        (
+        year_list
+        ),
+        index=None,
+        placeholder="Select year from...",
+    )
+
+with row2_3:
+    selected_player = st.selectbox(
+        "Player Count (Optional)",
+        (
+        [1,2,3,4,5,6]
+        ),
+        index=None,
+        placeholder="Select player...",
+    )
+
+with row2_4:
+    selected_rating = st.selectbox(
+        "Min. Rating (Optional)",
+        (
+        [10,9,8,7,6,5,4,3,2,1]
+        ),
+        index=None,
+        placeholder="Select rating...",
+    )
+    
+with row2_5:
+    # selected_rated = st.selectbox(
+    #     "Min. User Rated (Optional)",
+    #     (
+    #     [250,1000,5000,10000]
+    #     ),
+    #     index=None,
+    #     placeholder="Select user rated...",
+    # )
+
+    selected_rated = st.slider(
+    "Min. User Rated (Optional)",
+    0, 10000, step=500,
+    value = 0)
 
 st.text("")
 
-row2_1, row2_spacer1, row2_2, row2_spacer2, row2_3 = st.columns((0.2, 0.05, 0.2, 0.05, 0.5))
+row3_1, row3_spacer1, row3_2, row3_spacer2, row3_3 = st.columns((0.2, 0.05, 0.2, 0.05, 0.5))
 
 run_algo = False
 
 if selected_game:
-    with row2_1:
+    with row3_1:
         img_url = game_df[game_df['name'] == selected_game]['image'].values[0]
         st.image(img_url, width =200)
 
-    with row2_2:
+    with row3_2:
         game_id = game_df[game_df['name'] == selected_game]['bgg_id'].values[0]
         game_naming = game_df[game_df['name'] == selected_game]['name'].values[0]
         game_year = game_df[game_df['name'] == selected_game]['year'].values[0]
@@ -115,7 +167,7 @@ if selected_game:
         st.write(f":game_die: **Game Name**: :black[{game_naming}]")
         st.write(f":date: **Year Published**: :black[{game_year}]")
 
-    with row2_3:
+    with row3_3:
         if st.button("Click Me to Run Recommendation! :rocket:", type="primary"):
             run_algo = True
 
@@ -126,7 +178,7 @@ if selected_game and run_algo:
         index = game_name[game_name['name'] == selected_game].index[0]
         selected_row = game_df.loc[[index]]
 
-        final_idx, final_measure = find_games(game_df, selected_row, False)
+        final_idx, final_measure = find_games(game_df, selected_row, selected_year, selected_player, selected_rating)
         #recommended_df = processed_name.iloc[final_idx]
 
         final_df = game_df.iloc[final_idx][['bgg_id','name','year','thumbnail','link']].copy()
