@@ -18,7 +18,7 @@ st.write("Board Games Reviews")
 @st.cache_resource(ttl=3600)
 def get_game_data():
     conn = st.experimental_connection('gcs', type=FilesConnection)
-    df = conn.read("boardgamewhiz-bucket/game_df.csv", input_format="csv", ttl=600)
+    df = conn.read("boardgamewhiz-bucket/game_info_reviews.csv", input_format="csv", ttl=600)
     return df
 
 df = get_game_data()
