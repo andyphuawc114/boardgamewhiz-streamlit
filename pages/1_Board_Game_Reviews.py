@@ -104,8 +104,7 @@ if selected_game and selected_sentiment:
         FROM `tensile-walker-401308.eng_reviews.reviews` 
         where name = '{selected_game}' 
         and final_sentiment = '{selected_sentiment}'
-        order by label_proba desc
-        limit 10)
+        order by label_proba desc)
         '''
         reviews_df = pd.read_gbq(query, credentials = credentials)
 
