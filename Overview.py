@@ -23,8 +23,8 @@ def get_data():
 
 df = get_data()
 
-if 'main' not in st.session_state:
-    st.session_state['main'] = df
+# if 'main' not in st.session_state:
+#     st.session_state['main'] = df
 
 # load data
 #conn = st.experimental_connection('gcs', type=FilesConnection)

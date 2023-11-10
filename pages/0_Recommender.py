@@ -1,7 +1,5 @@
 import pandas as pd
 import streamlit as st
-from distython import HEOM
-from sklearn.neighbors import NearestNeighbors
 from st_files_connection import FilesConnection
 import gower
 
@@ -64,7 +62,7 @@ def find_games(game_df, selected_row, solo = None, year_after = None):
     if year_after:
         game_df = game_df[game_df['year'] >= year_after]
         
-    processed_name = game_df[['name','bgg_id','year']]
+    # processed_name = game_df[['name','bgg_id','year']]
 
     game_df = game_df.drop(columns = ['name','image','thumbnail','family_group','bgg_id','year','link'])
     selected_row = selected_row.drop(columns = ['name','image','thumbnail','family_group','bgg_id','year','link'])
@@ -80,7 +78,7 @@ def find_games(game_df, selected_row, solo = None, year_after = None):
     final_measure = sim_measure.flatten()[final_idx]
     game_measure = (1 - final_measure)[1:]
 
-    return processed_name, game_idx, game_measure
+    return game_idx, game_measure
 
 games = game_df['name']
 game_name = pd.DataFrame(game_df['name'])
@@ -128,7 +126,7 @@ if selected_game and run_algo:
         index = game_name[game_name['name'] == selected_game].index[0]
         selected_row = game_df.loc[[index]]
 
-        processed_name, final_idx, final_measure = find_games(game_df, selected_row, False)
+        final_idx, final_measure = find_games(game_df, selected_row, False)
         #recommended_df = processed_name.iloc[final_idx]
 
         final_df = game_df.iloc[final_idx][['bgg_id','name','year','thumbnail','link']].copy()

@@ -2,7 +2,8 @@ import numpy as np
 import streamlit as st
 import pandas as pd
 from google.oauth2 import service_account
-from st_aggrid import GridOptionsBuilder, AgGrid, GridUpdateMode, DataReturnMode, JsCode, ColumnsAutoSizeMode
+from st_aggrid import GridOptionsBuilder, AgGrid, JsCode, ColumnsAutoSizeMode
+from st_files_connection import FilesConnection
 
 st.set_page_config(page_title="Board Game Reviews",
                    page_icon="📊",
@@ -15,13 +16,14 @@ st.write(
 st.write("Board Games Reviews")
 
 @st.cache_resource(ttl=3600)
-def get_data():
-    df = st.session_state['main'].copy()
+def get_game_data():
+    conn = st.experimental_connection('gcs', type=FilesConnection)
+    df = conn.read("boardgamewhiz-bucket/game_df.csv", input_format="csv", ttl=600)
     return df
 
-df = get_data()
+df = get_game_data()
 
-df['bgg_name'] = df['bgg_id'].astype(str) + ": " + df['name']
+#df['bgg_name'] = df['bgg_id'].astype(str) + ": " + df['name']
 bgg = df['name'].unique()
 
 # QUERY FOR GAME REVIEWS BASED ON USER SELECTION
