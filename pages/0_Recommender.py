@@ -2,6 +2,8 @@ import pandas as pd
 import streamlit as st
 from distython import HEOM
 from sklearn.neighbors import NearestNeighbors
+from st_files_connection import FilesConnection
+import gower
 
 st.set_page_config(page_title="Recommendation",
                    page_icon="📊",
@@ -35,8 +37,8 @@ def get_game_data():
 
 game_df = get_game_data()
 
-game_attributes_df = game_df[['bgg_id','name','year','thumbnail']].copy()
-game_attributes_df['link'] = game_attributes_df['bgg_id'].apply(lambda x: "https://boardgamegeek.com/boardgame/" + str(x))
+# game_attributes_df = game_df[['bgg_id','name','year','thumbnail']].copy()
+# game_attributes_df['link'] = game_attributes_df['bgg_id'].apply(lambda x: "https://boardgamegeek.com/boardgame/" + str(x))
 
 # FUNCTIONS TO CONVERT TO HTML TABLE
 # Converting links to html tags
@@ -51,7 +53,6 @@ def convert_df(input_df):
      # IMPORTANT: Cache the conversion to prevent computation on every rerun
      return input_df.to_html(escape=False, formatters=dict(Image=path_to_image_html, ID=path_to_url_html))
 
-
 # RECOMMENDATION ALGO
 def find_games(game_df, selected_row, solo = None, year_after = None):
     fam = selected_row['family_group'].iloc[0]
@@ -63,30 +64,23 @@ def find_games(game_df, selected_row, solo = None, year_after = None):
     if year_after:
         game_df = game_df[game_df['year'] >= year_after]
         
-    game_df = pd.concat([game_df, selected_row])
     processed_name = game_df[['name','bgg_id','year']]
-    game_df = game_df.drop(columns = ['name','family_group','bgg_id','year','thumbnail','image'])
-    selected_row = selected_row.drop(columns = ['name','family_group','bgg_id','year','thumbnail','image'])
-    
-    nan_eqv = 9999
-    categorical_ix = [i+6 for i in range(284)]
-    game_df = game_df.fillna(9999)
-    heom_metric = HEOM(game_df, categorical_ix, nan_equivalents = [nan_eqv])
-    neighbor = NearestNeighbors(metric = heom_metric.heom)
-    neighbor.fit(game_df)
-    result = neighbor.kneighbors(selected_row, n_neighbors=12)
-    
-    # print(result[0][0])
-    # print(result[1][0])
+
+    game_df = game_df.drop(columns = ['name','image','thumbnail','family_group','bgg_id','year','link'])
+    selected_row = selected_row.drop(columns = ['name','image','thumbnail','family_group','bgg_id','year','link'])
+
+    sim_measure = gower.gower_matrix(game_df, selected_row)
+    idx = sim_measure.flatten().argsort()[:11]
     
     if fam != " ":
-        final_idx = result[1][0][0:11]
-        final_measure = result[0][0][0:11]
+        final_idx = idx[1:11]
     else:
-        final_idx = result[1][0][1:12]
-        final_measure = result[0][0][1:12]
+        final_idx = idx[0:11]
+    game_idx = game_df.iloc[final_idx].index
+    final_measure = sim_measure.flatten()[final_idx]
+    game_measure = (1 - final_measure)[1:]
 
-    return processed_name, final_idx, final_measure
+    return processed_name, game_idx, game_measure
 
 games = game_df['name']
 game_name = pd.DataFrame(game_df['name'])
@@ -135,9 +129,9 @@ if selected_game and run_algo:
         selected_row = game_df.loc[[index]]
 
         processed_name, final_idx, final_measure = find_games(game_df, selected_row, False)
-        recommended_df = pd.concat([processed_name.iloc[final_idx],pd.DataFrame(final_measure).set_index(processed_name.iloc[final_idx].index)], axis = 1)
+        #recommended_df = processed_name.iloc[final_idx]
 
-        final_df = game_attributes_df[game_attributes_df['bgg_id'].isin(recommended_df['bgg_id'].to_list())].copy()
+        final_df = game_df.iloc[final_idx][['bgg_id','name','year','thumbnail','link']].copy()
         final_df = final_df.rename({'bgg_id': 'ID', 'name': 'Game', 'year':'Year Published', 'thumbnail': 'Image', 'link':'URL'}, axis=1)
 
         html = convert_df(final_df)
