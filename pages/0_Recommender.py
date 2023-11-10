@@ -14,7 +14,7 @@ st.write(
 # bring the cache data from overview to this page
 raw_df = st.session_state['main_data']
 
-st.cache_data(ttl=3600)
+@st.cache_data(ttl=3600)
 def get_game_df(raw_df):
     df = raw_df[raw_df['game_type'] == 'boardgame'].copy()
     df = df[df['max_playtime'] != 0].copy()
@@ -39,7 +39,7 @@ def path_to_image_html(path):
 def path_to_url_html(ID):
     return '<a href="https://boardgamegeek.com/boardgame/' + str(ID) + '">' + str(ID) + "<" + "/" "a>"
 
-st.cache_data(ttl=3600)
+@st.cache_data(ttl=3600)
 def convert_df(input_df):
      # IMPORTANT: Cache the conversion to prevent computation on every rerun
      return input_df.to_html(escape=False, formatters=dict(Image=path_to_image_html, ID=path_to_url_html))
