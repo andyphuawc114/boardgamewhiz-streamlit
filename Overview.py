@@ -21,11 +21,10 @@ def get_data():
     df = conn.read("boardgamewhiz-bucket/boardgames_cleaned.csv", input_format="csv", ttl=600)
     return df
 
-
 df = get_data()
 
-if 'main_data' not in st.session_state:
-    st.session_state['main_data'] = df['name']
+if 'main' not in st.session_state:
+    st.session_state['main'] = df
 
 # load data
 #conn = st.experimental_connection('gcs', type=FilesConnection)

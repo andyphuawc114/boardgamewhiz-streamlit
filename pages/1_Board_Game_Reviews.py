@@ -14,9 +14,15 @@ st.write(
 
 st.write("Board Games Reviews")
 
-bgg = st.session_state['main_data'].copy()
-#df['bgg_name'] = df['bgg_id'].astype(str) + ": " + df['name']
-#bgg = df['name'].unique()
+@st.cache_resource(ttl=3600)
+def get_data():
+    df = st.session_state['main'].copy()
+    return df
+
+df = get_data()
+
+df['bgg_name'] = df['bgg_id'].astype(str) + ": " + df['name']
+bgg = df['name'].unique()
 
 # QUERY FOR GAME REVIEWS BASED ON USER SELECTION
 
@@ -153,6 +159,7 @@ if selected_game and selected_sentiment:
             custom_css={"#gridToolBar": {"padding-bottom": "0px !important"}}
             )
 
+        del reviews_df
 
 
 

@@ -140,8 +140,7 @@ if selected_game and run_algo:
         html,
         unsafe_allow_html=True)
 
-
-
+        del final_df
 
     #st.dataframe(recommended_df, hide_index = True)
 
