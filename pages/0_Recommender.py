@@ -11,22 +11,29 @@ st.write(
     """This page recommends similar board games to the selected board game"""
 )
 
-# bring the cache data from overview to this page
-raw_df = st.session_state['main_data']
+# # bring the cache data from overview to this page
+# raw_df = st.session_state['main_data']
 
-@st.cache_data(ttl=3600)
-def get_game_df(raw_df):
-    df = raw_df[raw_df['game_type'] == 'boardgame'].copy()
-    df = df[df['max_playtime'] != 0].copy()
-    df = df.drop(columns = ['rank','game_type','description','expansion','designer','artist','publisher',
-                            'reimplementation','user_rating','avg_rating','avg_rating_group','bayes_rating','std_dev', 'median','owned',
-                            'trading','wanting','wishing','num_comments','family_list', 'num_weights','playtime',
-                             'player_recommend','age_recommend'])
-    game_df = df.copy()
-    print(game_df.columns)
-    return game_df
 
-game_df = get_game_df(raw_df)
+@st.cache_resource(ttl=3600)
+def get_game_data():
+    conn = st.experimental_connection('gcs', type=FilesConnection)
+    df = conn.read("boardgamewhiz-bucket/game_df.csv", input_format="csv", ttl=600)
+    return df
+
+# @st.cache_data(ttl=3600)
+# def get_game_df(raw_df):
+#     df = raw_df[raw_df['game_type'] == 'boardgame'].copy()
+#     df = df[df['max_playtime'] != 0].copy()
+#     df = df.drop(columns = ['rank','game_type','description','expansion','designer','artist','publisher',
+#                             'reimplementation','user_rating','avg_rating','avg_rating_group','bayes_rating','std_dev', 'median','owned',
+#                             'trading','wanting','wishing','num_comments','family_list', 'num_weights','playtime',
+#                              'player_recommend','age_recommend'])
+#     game_df = df.copy()
+#     print(game_df.columns)
+#     return game_df
+
+game_df = get_game_data()
 
 game_attributes_df = game_df[['bgg_id','name','year','thumbnail']].copy()
 game_attributes_df['link'] = game_attributes_df['bgg_id'].apply(lambda x: "https://boardgamegeek.com/boardgame/" + str(x))
@@ -119,10 +126,6 @@ if selected_game:
     with row2_3:
         if st.button("Click Me to Run Recommendation! :rocket:", type="primary"):
             run_algo = True
-
-
-
-
 
 st.text("")
 
