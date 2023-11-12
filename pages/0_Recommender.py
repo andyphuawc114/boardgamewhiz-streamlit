@@ -46,7 +46,7 @@ def path_to_image_html(path):
 def path_to_url_html(ID):
     return '<a href="https://boardgamegeek.com/boardgame/' + str(ID) + '">' + str(ID) + "<" + "/" "a>"
 
-@st.cache_data(ttl=3600)
+#@st.cache_data(ttl=3600)
 def convert_df(input_df):
      # IMPORTANT: Cache the conversion to prevent computation on every rerun
      return input_df.to_html(escape=False, formatters=dict(Image=path_to_image_html, ID=path_to_url_html))
