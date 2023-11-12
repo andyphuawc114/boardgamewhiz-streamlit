@@ -55,6 +55,16 @@ st.markdown(
 """
 )
 
+st.divider() 
+
+st.markdown(
+    """
+    Below are visuals to show the popularity and trends in the board game industry.
+    You can interact with the visuals by hovering over the data point, or zooming into specific part of the visuals
+    for more focused analysis.
+"""
+)
+
 @st.cache_data(ttl=3600)
 def line_chart(df):
     df_ratings = df[['bgg_id', 'name', 'year', 'avg_rating']]
@@ -133,6 +143,7 @@ row1_1, row1_space1, row1_2 = st.columns((0.45, 0.1, 0.45))
 
 # LINE CHART TO SHOW USER RATINGS TREND
 with row1_1:
+
     st.subheader("Average User Ratings Trend")
     line_chart(df)
 
@@ -146,11 +157,11 @@ row2_1, row1_space1, row2_2 = st.columns((0.45, 0.1, 0.45))
 # SCATTER PLOT CHART OF WEIGHT-RATING
 
 with row2_1:
-    st.subheader("Complexity-Rating")
+    st.subheader("Complexity-Rating Trend")
     scatter_chart(df)
 
 with row2_2:
-    st.subheader("Heatmap")
+    st.subheader("Game Category Count")
     heatmap(df)
 
 
