@@ -60,6 +60,7 @@ st.divider()
 st.markdown(
     """
     Below are visuals to show the popularity and trends in the board game industry.
+    The board games are pre-filtered to those published between year 2000 to 2023 to examine the most recent trends.
     You can interact with the visuals by hovering over the data point, or zooming into specific part of the visuals
     for more focused analysis.
 """
