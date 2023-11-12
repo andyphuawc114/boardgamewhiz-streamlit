@@ -4,6 +4,7 @@ import pandas as pd
 from google.oauth2 import service_account
 from st_aggrid import GridOptionsBuilder, AgGrid, JsCode, ColumnsAutoSizeMode
 from st_files_connection import FilesConnection
+import gc
 
 st.set_page_config(page_title="Board Game Reviews",
                    page_icon="📊",
@@ -184,6 +185,7 @@ if selected_game and selected_sentiment and run_algo:
             )
 
         del reviews_df
+        gc.collect()
 
 
 

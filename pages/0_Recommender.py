@@ -2,6 +2,7 @@ import pandas as pd
 import streamlit as st
 from st_files_connection import FilesConnection
 import gower
+import gc
 
 st.set_page_config(page_title="Recommendation",
                    page_icon="📊",
@@ -191,6 +192,7 @@ if selected_game and run_algo:
         unsafe_allow_html=True)
 
         del final_df
+        gc.collect()
 
     #st.dataframe(recommended_df, hide_index = True)
 
