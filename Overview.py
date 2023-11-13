@@ -18,7 +18,7 @@ LOGGER = get_logger(__name__)
 @st.cache_resource(ttl=3600)
 def get_data():
     conn = st.experimental_connection('gcs', type=FilesConnection)
-    df = conn.read("boardgamewhiz-bucket/boardgames_cleaned.csv", input_format="csv", ttl=600)
+    df = conn.read("boardgamewhiz-bucket/boardgames_cleaned_20XX.csv", input_format="csv", ttl=600)
     return df
 
 df = get_data()
@@ -69,7 +69,7 @@ st.markdown(
 @st.cache_data(ttl=3600)
 def line_chart(df):
     df_ratings = df[['bgg_id', 'name', 'year', 'avg_rating']]
-    df_ratings = df_ratings[(df_ratings['year'] >= 2000) & (df_ratings['year'] <= 2023)]
+    #df_ratings = df_ratings[(df_ratings['year'] >= 2000) & (df_ratings['year'] <= 2023)]
     df_ratings_avg = df_ratings.groupby('year')['avg_rating'].mean().reset_index()
 
     fig = px.line(df_ratings_avg, x="year", y="avg_rating",
@@ -105,7 +105,7 @@ def scatter_chart(df):
     df_weights['avg_rating'] = df_weights['avg_rating'].round(2)
     df_weights['avg_weights'] = df_weights['avg_weights'].round(2)
 
-    df_weights = df_weights[(df_weights['year'] >= 2000) & (df_weights['year'] <= 2023) & (df_weights['user_rating'] >= 1000)]
+    df_weights =  df_weights[df_weights['user_rating'] >= 1000]
 
     fig = px.scatter(df_weights, x="avg_weights", y="avg_rating", opacity=0.5, hover_data=['name','year','user_rating'], 
                  labels={"name":"Game","avg_weights": "Complexity","avg_rating": "Rating",'year':'Year','user_rating':'Votes'})
@@ -114,7 +114,8 @@ def scatter_chart(df):
 
 @st.cache_data(ttl=3600)
 def heatmap(df):
-    new_df = df[(df['year'] >= 2000) & (df['year'] <= 2023)].copy()
+    #new_df = df[(df['year'] >= 2000) & (df['year'] <= 2023)].copy()
+    new_df = df.copy()
     my_col = new_df.columns[new_df.columns.str.contains('cat_')].to_list()
     my_col.append('year')
     new_df = new_df[my_col]
