@@ -147,7 +147,7 @@ with row2_5:
     selected_rated = st.slider(
     "Min. User Rated (Optional)",
     0, 10000, step=500,
-    value = 0)
+    value = 100)
 
 st.text("")
 
