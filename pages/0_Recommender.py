@@ -86,7 +86,7 @@ def find_games(game_df, selected_row, selected_year = None, selected_player = No
     return game_idx, game_measure
 
 g = game_df['name']
-games = sorted(games, key=str.lower)
+games = sorted(g, key=str.lower)
 game_name = pd.DataFrame(game_df['name'])
 
 row1_spacer1, row1_1, row1_spacer2 = st.columns((0.020, 0.96, 0.020))
