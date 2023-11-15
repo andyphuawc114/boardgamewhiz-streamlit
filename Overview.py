@@ -5,6 +5,8 @@ from st_pages import Page, show_pages, add_page_title
 import pandas as pd
 import plotly.express as px
 import numpy as np
+import plotly.graph_objects as go
+from plotly.subplots import make_subplots
 
 st.set_page_config(
     page_title="BoardGameWhiz",
@@ -70,10 +72,31 @@ st.markdown(
 def line_chart(df):
     df_ratings = df[['bgg_id', 'name', 'year', 'avg_rating']]
     #df_ratings = df_ratings[(df_ratings['year'] >= 2000) & (df_ratings['year'] <= 2023)]
-    df_ratings_avg = df_ratings.groupby('year')['avg_rating'].mean().reset_index()
+    #df_ratings_avg = df_ratings.groupby('year')['avg_rating'].mean().reset_index()
 
-    fig = px.line(df_ratings_avg, x="year", y="avg_rating",
-            labels={"year": "Year Published","avg_rating": "Avg User Rating"})
+    df_ratings_avg = df_ratings.groupby('year').agg(avg_rating=('avg_rating', np.mean),count_game=('year', 'count')).reset_index()
+
+    # fig = px.line(df_ratings_avg, x="year", y="avg_rating",
+    #         labels={"year": "Year Published","avg_rating": "Avg User Rating"})
+
+    # fig.add_bar(x=df_ratings_avg["year"], y=df_ratings_avg["count_game"], name="Game Count")
+
+    fig = make_subplots(specs=[[{"secondary_y": True}]])
+    fig2 = px.line(df_ratings_avg, x="year", y="avg_rating",
+             labels={"year": "Year Published","avg_rating": "Avg User Rating"})
+    for t in fig2.select_traces():
+        fig.add_trace(t, secondary_y = False)
+
+    fig.add_trace(go.Bar(x = df_ratings_avg["year"], y = df_ratings_avg["count_game"], name="Game Count"), secondary_y = True)
+    fig.update_yaxes(range=[4,6.8], secondary_y=False)
+    fig.update_yaxes(range=[1000,10000], showgrid=False, secondary_y=True)
+
+    fig.update_layout(legend=dict(
+    yanchor="top",
+    y=1.1,
+    xanchor="left",
+    x=0.01
+    ))
 
     st.plotly_chart(fig, theme="streamlit", use_container_width=True)
 
