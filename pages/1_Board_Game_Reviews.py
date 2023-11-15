@@ -166,9 +166,11 @@ if selected_game and selected_sentiment and run_algo:
                                                                 }"""))
         
         gb.configure_grid_options(domLayout='normal')
+        gb.configure_columns("Review",wrapText = True,cellStyle= {"wordBreak": "normal"})
+        gb.configure_columns("Review",autoHeight = True)
         gridOptions = gb.build()
         
-        grid_height = 380
+        grid_height = 700
 
         st.write("*You can hover your mouse over the 'Review' text. A tooltip will display the full review text* :wink:")
         st.text("")
