@@ -17,13 +17,13 @@ st.set_page_config(
 
 LOGGER = get_logger(__name__)
 
-@st.cache_resource(ttl=3600)
-def get_data():
-    conn = st.experimental_connection('gcs', type=FilesConnection)
-    df = conn.read("boardgamewhiz-bucket/boardgames_cleaned_20XX.csv", input_format="csv", ttl=600)
-    return df
+# @st.cache_resource(ttl=3600)
+# def get_data():
+#     conn = st.experimental_connection('gcs', type=FilesConnection)
+#     df = conn.read("boardgamewhiz-bucket/boardgames_cleaned_20XX.csv", input_format="csv", ttl=600)
+#     return df
 
-df = get_data()
+# df = get_data()
 
 # if 'main' not in st.session_state:
 #     st.session_state['main'] = df
@@ -69,12 +69,12 @@ st.markdown(
 )
 
 @st.cache_data(ttl=3600)
-def line_chart(df):
-    df_ratings = df[['bgg_id', 'name', 'year', 'avg_rating']]
+def line_chart():
+    # df_ratings = df[['bgg_id', 'name', 'year', 'avg_rating']]
     #df_ratings = df_ratings[(df_ratings['year'] >= 2000) & (df_ratings['year'] <= 2023)]
     #df_ratings_avg = df_ratings.groupby('year')['avg_rating'].mean().reset_index()
 
-    df_ratings_avg = df_ratings.groupby('year').agg(avg_rating=('avg_rating', np.mean),count_game=('year', 'count')).reset_index()
+    df_ratings_avg = pd.read_csv("./dataset/df_ratings_avg.csv")
 
     # fig = px.line(df_ratings_avg, x="year", y="avg_rating",
     #         labels={"year": "Year Published","avg_rating": "Avg User Rating"})
@@ -101,15 +101,17 @@ def line_chart(df):
     st.plotly_chart(fig, theme="streamlit", use_container_width=True)
 
 @st.cache_data(ttl=3600)
-def bar_chart(df):
-    df_genre = df[['bgg_id', 'name', 'year', 'avg_rating','avg_rating_group', 'abstracts', 'cgs', 'childrensgames', 'familygames', 'partygames', 'strategygames', 'thematic', 'wargames']].copy()
-    df_genre = df_genre[df_genre['avg_rating'] > 0.00]
-    df_genre = df_genre[['avg_rating_group','abstracts', 'cgs', 'childrensgames', 'familygames', 'partygames', 'strategygames', 'thematic', 'wargames']]
-    genre_dict = {'abstracts': 'Abstract', 'cgs': 'Customizable', 'childrensgames': 'Children', 'familygames': 'Family', 'partygames': 'Party',
-            'strategygames': 'Strategy', 'thematic': 'Thematic', 'wargames': 'War'}
-    df_genre = df_genre.rename(genre_dict, axis = 1)
-    df_genre_rating = df_genre.groupby('avg_rating_group').sum().reset_index()
-    df_genre_rating = pd.melt(df_genre_rating, id_vars=['avg_rating_group'])
+def bar_chart():
+    # df_genre = df[['bgg_id', 'name', 'year', 'avg_rating','avg_rating_group', 'abstracts', 'cgs', 'childrensgames', 'familygames', 'partygames', 'strategygames', 'thematic', 'wargames']].copy()
+    # df_genre = df_genre[df_genre['avg_rating'] > 0.00]
+    # df_genre = df_genre[['avg_rating_group','abstracts', 'cgs', 'childrensgames', 'familygames', 'partygames', 'strategygames', 'thematic', 'wargames']]
+    # genre_dict = {'abstracts': 'Abstract', 'cgs': 'Customizable', 'childrensgames': 'Children', 'familygames': 'Family', 'partygames': 'Party',
+    #         'strategygames': 'Strategy', 'thematic': 'Thematic', 'wargames': 'War'}
+    # df_genre = df_genre.rename(genre_dict, axis = 1)
+    # df_genre_rating = df_genre.groupby('avg_rating_group').sum().reset_index()
+    # df_genre_rating = pd.melt(df_genre_rating, id_vars=['avg_rating_group'])
+
+    df_genre_rating = pd.read_csv("dataset\df_genre_rating.csv")
     fig = px.bar(df_genre_rating, x="avg_rating_group", y="value", color="variable",
         labels={"avg_rating_group": "User Rating","value": "Game Count", "variable": "Genre"})
 
@@ -123,12 +125,14 @@ def bar_chart(df):
     st.plotly_chart(fig, theme="streamlit", use_container_width=True)    
 
 @st.cache_data(ttl=3600)
-def scatter_chart(df):
-    df_weights = df[['bgg_id', 'name', 'year', 'avg_rating', 'avg_weights', 'user_rating']].copy()
-    df_weights['avg_rating'] = df_weights['avg_rating'].round(2)
-    df_weights['avg_weights'] = df_weights['avg_weights'].round(2)
+def scatter_chart():
+    # df_weights = df[['bgg_id', 'name', 'year', 'avg_rating', 'avg_weights', 'user_rating']].copy()
+    # df_weights['avg_rating'] = df_weights['avg_rating'].round(2)
+    # df_weights['avg_weights'] = df_weights['avg_weights'].round(2)
 
-    df_weights =  df_weights[df_weights['user_rating'] >= 1000]
+    # df_weights =  df_weights[df_weights['user_rating'] >= 1000]
+
+    df_weights = pd.read_csv("df_weights.csv")
 
     fig = px.scatter(df_weights, x="avg_weights", y="avg_rating", opacity=0.5, hover_data=['name','year','user_rating'], 
                  labels={"name":"Game","avg_weights": "Complexity","avg_rating": "Rating",'year':'Year','user_rating':'Votes'})
@@ -136,28 +140,30 @@ def scatter_chart(df):
     st.plotly_chart(fig, theme="streamlit", use_container_width=True)          
 
 @st.cache_data(ttl=3600)
-def heatmap(df):
-    #new_df = df[(df['year'] >= 2000) & (df['year'] <= 2023)].copy()
-    new_df = df.copy()
-    my_col = new_df.columns[new_df.columns.str.contains('cat_')].to_list()
-    my_col.append('year')
-    new_df = new_df[my_col]
+def heatmap():
+    # #new_df = df[(df['year'] >= 2000) & (df['year'] <= 2023)].copy()
+    # new_df = df.copy()
+    # my_col = new_df.columns[new_df.columns.str.contains('cat_')].to_list()
+    # my_col.append('year')
+    # new_df = new_df[my_col]
 
-    # top 1000 games
-    df_test = new_df.iloc[:1000].copy()
+    # # top 1000 games
+    # df_test = new_df.iloc[:1000].copy()
 
-    col_to_delete = df_test.sum(axis=0, numeric_only = True).reset_index().rename({0:'value'}, axis = 1)
-    col_to_delete = col_to_delete[col_to_delete['value'] == 0.0]['index'].to_list()
-    col_to_delete = [i for i in col_to_delete if 'cat_' in i]
-    df_matrix = df_test.drop(columns=col_to_delete)
+    # col_to_delete = df_test.sum(axis=0, numeric_only = True).reset_index().rename({0:'value'}, axis = 1)
+    # col_to_delete = col_to_delete[col_to_delete['value'] == 0.0]['index'].to_list()
+    # col_to_delete = [i for i in col_to_delete if 'cat_' in i]
+    # df_matrix = df_test.drop(columns=col_to_delete)
 
-    df_matrix.columns = df_matrix.columns.str.replace("cat_","")
-    df_matrix = df_matrix.rename({'Industry / Manufacturing': 'Industry'}, axis = 1)
-    df_matrix = df_matrix.groupby('year').sum()
-    game_idx = df_matrix.sum().reset_index()
-    fifty_idx = game_idx[game_idx[0] > 50]
+    # df_matrix.columns = df_matrix.columns.str.replace("cat_","")
+    # df_matrix = df_matrix.rename({'Industry / Manufacturing': 'Industry'}, axis = 1)
+    # df_matrix = df_matrix.groupby('year').sum()
+    # game_idx = df_matrix.sum().reset_index()
+    # fifty_idx = game_idx[game_idx[0] > 50]
 
-    df_matrix = df_matrix[fifty_idx['index']]
+    # df_matrix = df_matrix[fifty_idx['index']]
+
+    df_matrix = pd.read_csv("df_matrix.csv")
     fig = px.imshow(df_matrix.T, labels={"x":"Year","y": "Category",'color':'Count'})
     fig.update_layout(yaxis_title=None, yaxis = dict(tickfont = dict(size=10)))
 
@@ -170,12 +176,12 @@ row1_1, row1_space1, row1_2 = st.columns((0.45, 0.1, 0.45))
 with row1_1:
 
     st.subheader("Average User Ratings Trend")
-    line_chart(df)
+    line_chart()
 
 # STACKED BAR CHART TO SHOW USER RATING BY GENRE
 with row1_2:
     st.subheader("User Rating by Genre")
-    bar_chart(df)
+    bar_chart()
 
 row2_1, row1_space1, row2_2 = st.columns((0.45, 0.1, 0.45))
 
@@ -183,11 +189,11 @@ row2_1, row1_space1, row2_2 = st.columns((0.45, 0.1, 0.45))
 
 with row2_1:
     st.subheader("Complexity-Rating Trend")
-    scatter_chart(df)
+    scatter_chart()
 
 with row2_2:
     st.subheader("Game Category Count")
-    heatmap(df)
+    heatmap()
 
 
 # if __name__ == "__main__":
