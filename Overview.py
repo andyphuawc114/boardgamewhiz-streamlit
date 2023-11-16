@@ -111,7 +111,7 @@ def bar_chart():
     # df_genre_rating = df_genre.groupby('avg_rating_group').sum().reset_index()
     # df_genre_rating = pd.melt(df_genre_rating, id_vars=['avg_rating_group'])
 
-    df_genre_rating = pd.read_csv("dataset\df_genre_rating.csv")
+    df_genre_rating = pd.read_csv("./dataset/df_genre_rating.csv")
     fig = px.bar(df_genre_rating, x="avg_rating_group", y="value", color="variable",
         labels={"avg_rating_group": "User Rating","value": "Game Count", "variable": "Genre"})
 
@@ -132,7 +132,7 @@ def scatter_chart():
 
     # df_weights =  df_weights[df_weights['user_rating'] >= 1000]
 
-    df_weights = pd.read_csv("df_weights.csv")
+    df_weights = pd.read_csv("./dataset/df_weights.csv")
 
     fig = px.scatter(df_weights, x="avg_weights", y="avg_rating", opacity=0.5, hover_data=['name','year','user_rating'], 
                  labels={"name":"Game","avg_weights": "Complexity","avg_rating": "Rating",'year':'Year','user_rating':'Votes'})
@@ -163,7 +163,7 @@ def heatmap():
 
     # df_matrix = df_matrix[fifty_idx['index']]
 
-    df_matrix = pd.read_csv("df_matrix.csv")
+    df_matrix = pd.read_csv("./dataset/df_matrix.csv")
     fig = px.imshow(df_matrix.T, labels={"x":"Year","y": "Category",'color':'Count'})
     fig.update_layout(yaxis_title=None, yaxis = dict(tickfont = dict(size=10)))
 
