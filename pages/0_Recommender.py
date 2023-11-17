@@ -9,9 +9,13 @@ st.set_page_config(page_title="Recommendation",
                    layout = 'wide')
 st.markdown("# Board Game Recommendation")
 st.write(
-    """This page recommends similar board games to the selected board game"""
+    """This page recommends similar board games to the selected board game. The recommendation algorithm is based on a 
+    content-based filtering model. It draws on the board games' features to determine similar board games 
+    with respect to the user selected board game. A distance-based measure, called the Gower’s Coefficient, is used to measure
+    the similarity between board games."""
 )
 
+st.write(" ")
 # # bring the cache data from overview to this page
 # raw_df = st.session_state['main_data']
 

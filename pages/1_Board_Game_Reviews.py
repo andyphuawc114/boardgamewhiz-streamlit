@@ -11,10 +11,17 @@ st.set_page_config(page_title="Board Game Reviews",
                    layout = 'wide')
 st.markdown("# Board Game Reviews")
 st.write(
-    """This page shows the board game reviews"""
+    """This page shows the board game reviews. Although board game reviews are tagged with a user rating,
+    the numerical rating of a review may not necessarily represent the true sentiment. 
+    We hope that this will aid users to better discover the reviews 
+    which are most relevant to their perferences. The sentiment analysis is performed using a [Sentence Transformer](https://github.com/huggingface/setfit) model
+    with transfer learning based on the reviews. 
+    We labelled the reviews with four classes: Positive, Negative, Neutral-Positive, and Neutral-Negative.
+"""
 )
 
-st.write("Board Games Reviews")
+
+st.write(" ")
 
 @st.cache_resource(ttl=3600)
 def get_game_data():

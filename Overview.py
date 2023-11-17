@@ -51,7 +51,7 @@ st.markdown(
     """
     ### Introduction
     BoardGameWhiz is a user-centric board game visualizer built for the board game community.
-    The data source is based on [boardgamegeek](https://boardgamegeek.com/)
+    The data source is based on [boardgamegeek](https://boardgamegeek.com/).
 
     **👈 Select from the sidebar** to navigate to other functions.
 """
