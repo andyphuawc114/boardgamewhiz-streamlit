@@ -162,7 +162,10 @@ run_algo = False
 if selected_game:
     with row3_1:
         img_url = game_df[game_df['name'] == selected_game]['image'].values[0]
-        st.image(img_url, width =200)
+        try:
+            st.image(img_url, width =200)
+        except:
+            st.image("https://i.ibb.co/tPp7HDZ/no-image.png", width =200)
 
     with row3_2:
         game_id = game_df[game_df['name'] == selected_game]['bgg_id'].values[0]
